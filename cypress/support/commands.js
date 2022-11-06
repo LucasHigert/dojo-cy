@@ -44,7 +44,6 @@ Cypress.Commands.add('login', () => {
         }).then(( response) => {
             expect(response.status).to.equal(200)
             expect(response.body).to.have.property("jwt")
-            expect(response.duration).be.lte(300)
         })
  })
 
@@ -66,3 +65,32 @@ Cypress.Commands.add('login', () => {
     cy.get('[data-test="profile-skills"] > .MuiInputBase-root > .MuiInputBase-input').type(message)
     cy.get('[data-test="profile-submit"]').click()
  })
+
+ Cypress.Commands.add('criarPost', (token, texto) => {
+    cy.request({
+        method: 'POST',
+        url: 'api/posts',
+        headers: {Cookie: token},
+        body:{
+            text: texto
+        }
+    })
+ })
+
+ Cypress.Commands.add('loginApp', () => {
+    cy.request({
+      method: 'POST',
+      url: 'api/auth',
+      body:
+      {
+        "email": user[0].usuario,
+        "password": user[0].senha
+      }
+    }).then((response) =>{
+        cy.setCookie('location' , 'BR-PR')
+        cy.setCookie('jwt' , response.body.jwt)
+        window.localStorage.setItem('logadoCom', user[0].usuario)
+        window.sessionStorage.setItem('jwt2', response.body.jwt)
+    })
+  
+  })
